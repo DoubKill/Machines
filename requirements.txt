@@ -1,0 +1,9 @@
+apscheduler==3.10.1
+psutil==5.9.5
+opcua==0.98.13
+cryptography==41.0.1
+pyinstaller==5.13.0
+psycopg2-binary==2.9.6
+pandas==2.0.3
+openpyxl==3.1.2
+xlsxwriter==3.1.2
