@@ -98,6 +98,7 @@ def common_exec_dock(server, ip_port, namespace, device, lk, sl_task, xl_task, n
                         # 故障恢复后又重发finish信号导致数量覆盖(1、对接挂掉 2、agv未读到允许离开时挂掉)[针对第二种情况]
                         get_exit_allow = server.get_node(f"ns={namespace};s=GZ_EquipmentLoadExitAllowed").get_value()
                         if get_exit_allow == 1:
+                            server.get_node(f"ns={namespace};s=GZ_EquipmentFaultStop").set_value(0)
                             server.get_node(f"ns={namespace};s=GZ_EquipmentLoadFinish").set_value(1)
                             server.get_node(f"ns={namespace};s=GZ_EquipmentLoading").set_value(0)
                             error_logger.info(f'{ip_port} {lk}: agv送料[put]-检测到agv传篮完成信号{var}-{signal}, 读取到允许离开信号 {get_exit_allow}++++++++++++++++++')
@@ -212,6 +213,7 @@ def common_exec_dock(server, ip_port, namespace, device, lk, sl_task, xl_task, n
                         get_exit_allow = server.get_node(f"ns={namespace};s=GZ_EquipmentUnloadExitAllowed").get_value()
                         if get_exit_allow == 1:
                             error_logger.info(f'{ip_port} {lk}: agv取料[fetch]-检测到agv传篮完成信号{var}-{signal}, 读取到允许离开信号 {get_exit_allow}------------------')
+                            server.get_node(f"ns={namespace};s=GZ_EquipmentFaultStop").set_value(0)
                             server.get_node(f"ns={namespace};s=GZ_EquipmentUnloadFinish").set_value(1)
                             server.get_node(f"ns={namespace};s=GZ_EquipmentUnloading").set_value(0)
                             continue
