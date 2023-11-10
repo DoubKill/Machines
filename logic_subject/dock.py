@@ -151,6 +151,7 @@ def common_exec_dock(server, ip_port, namespace, device, lk, sl_task, xl_task, n
                     elif var.endswith('Exit'):
                         error_logger.info(f'{ip_port} {lk}: agv送料[put]-检测到agv请求离开信号 {var}-{signal}++++++++++++++++++')
                         server.get_node(f"ns={namespace};s=GZ_EquipmentLoadExitAllowed").set_value(1)
+                        time.sleep(3)
                         server.get_node(f"ns={namespace};s=GZ_EquipmentLoadFinish").set_value(0)
                         server.get_node(f"ns={namespace};s=sl_finished").set_value(0)
                     else:
@@ -257,8 +258,9 @@ def common_exec_dock(server, ip_port, namespace, device, lk, sl_task, xl_task, n
                         error_logger.info(f'{ip_port} {lk}: agv取料[fetch]-检测到传篮开始信号 恢复故障点位为0 ------------------')
                     elif var.endswith('Exit'):
                         error_logger.info(f'{ip_port} {lk}: agv取料[fetch]-检测到agv请求离开信号{var}-{signal}------------------')
-                        server.get_node(f"ns={namespace};s=GZ_EquipmentUnloadFinish").set_value(0)
                         server.get_node(f"ns={namespace};s=GZ_EquipmentUnloadExitAllowed").set_value(1)
+                        time.sleep(3)
+                        server.get_node(f"ns={namespace};s=GZ_EquipmentUnloadFinish").set_value(0)
                         server.get_node(f"ns={namespace};s=xl_finished").set_value(0)
                     else:
                         error_logger.info(f'{ip_port} {lk}: agv取料[fetch]-检测到agv其他信号{var}-{signal}-{xl_num}------------------')
