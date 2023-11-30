@@ -1,6 +1,6 @@
-import sys
 import time
 import argparse
+import traceback
 from opcua import Client
 
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser()
         parser.add_argument('-i', '--host', type=str, help='plc服务ip地址')
         parser.add_argument('-p', '--port', type=str, help='plc服务端口')
-        parser.add_argument('-n', '--namespace', type=str, help='点位标签所处命名空间')
+        parser.add_argument('-n', '--namespace', type=int, default=2, help='点位标签所处命名空间')
         parser.add_argument('-l', '--label', type=str, help='点位标签名称')
         args, remaining_argv = parser.parse_known_args()
         host = args.host
@@ -38,4 +38,4 @@ if __name__ == '__main__':
             raise ValueError('启动参数异常:-i ip地址 -p 端口 -n 标签所处命名空间  -l 标签名称')
         write_agv_heart(host, port, namespace, label)
     except Exception as e:
-        print(f'模拟agv心跳出现异常: {e.args[0]}')
+        print(f'模拟agv心跳出现异常: {traceback.format_exc()}')

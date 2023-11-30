@@ -70,16 +70,7 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'standard',
             'interval': 1,
-        },
-        'prepareFile': {
-            'level': 'DEBUG',
-            'class': 'config.custom_log.CommonTimedRotatingFileHandler',
-            'filename': os.path.join(LOGGING_DIR, 'prepare_stock.log'),
-            'when': 'midnight',
-            'backupCount': 10,
-            'formatter': 'standard',
-            'interval': 1,
-        },
+        }
     },
     'loggers': {
         'api_log': {
@@ -101,10 +92,6 @@ LOGGING = {
         'heart_log': {
             'handlers': ['heartFile'],
             'level': 'DEBUG' if DEBUG else 'INFO',
-        },
-        'prepare_log': {
-            'handlers': ['prepareFile'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
         }
     }
 }
@@ -116,4 +103,3 @@ error_logger = logging.getLogger('error_log')
 backup_logger = logging.getLogger('backup_log')
 inventory_logger = logging.getLogger('inventory_log')
 heart_logger = logging.getLogger('heart_log')
-prepare_logger = logging.getLogger('prepare_log')

@@ -2,7 +2,6 @@ import os
 import sys
 from opcua import Server, ua
 from multiprocessing import Pool
-from task.snapshot import run_backup
 from config.json_config import JsonConf
 from config.log_config import api_logger
 from databases.excute_db import PostgresConnector
@@ -10,7 +9,7 @@ from logic_subject.inventory import update_stock
 from logic_subject.consume import device_consume_job
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
-from logic_subject.dock import common_device_dock, other_device_dock, heart, prepare_stock
+from logic_subject.dock import common_device_dock, other_device_dock, heart
 
 
 def start_server(device, single_lk):
@@ -50,27 +49,14 @@ def start_server(device, single_lk):
                 consume_scheduler.start()
 
             else:
-                # 堆栈口对应关系(更新同一个堆栈的所有口的库存信息)
-                stock_map = {'zrkh01': 60002, 'zrkh02': 60001, 'zrkh03': 60004, 'zrkh04': 60003, 'pkh01': 60006, 'pkh02': 60005, 'thh01': 60008, 'thh02': 60007,
-                             'seh01': 60010, 'seh02': 60009, 'bsgkh01': 60022, 'bsgkh02': 60021, 'lph01': 60024, 'lph02': 60023, 'lkh01': 60026, 'lkh02': 60025,
-                             'psgkh01': 60042, 'psgkh02': 60041, 'aldh01': 60044, 'aldh02': 60043, 'bph03': 60062, 'bph04': 60061, 'dbh01': 60064, 'dbh02': 60063}
-                stock_scheduler, other_scheduler = [BackgroundScheduler(), BackgroundScheduler()] if set(chute_list) == {1} else [None, BackgroundScheduler()]
+                other_scheduler = BackgroundScheduler()
                 # 对接
                 other_scheduler.add_job(other_device_dock, trigger='interval', seconds=1, args=(server, ip_port, device, namespace, chute_code))
                 other_scheduler.start()
-                # 堆栈只启动一个定时任务去更新更新Qtime和标签的值
-                if stock_scheduler:
-                    stock_scheduler.add_job(update_stock, trigger='interval', seconds=3, args=(server, ip_port, device, namespace, chute_code, stock_map))
-                    stock_scheduler.start()
-
-                # 备料定时任务
-                prepare_scheduler = BackgroundScheduler()
-                prepare_scheduler.add_job(prepare_stock, trigger='interval', seconds=3, args=(server, ip_port, device, namespace, chute_code))
-                prepare_scheduler.start()
 
             # 增加机台心跳
             heart_scheduler = BlockingScheduler()
-            heart_scheduler.add_job(heart, trigger='interval', seconds=3, args=(server, ip_port, device, namespace, chute_code, equip_type))
+            heart_scheduler.add_job(heart, trigger='interval', seconds=1, args=(server, ip_port, device, namespace, chute_code, equip_type))
             heart_scheduler.start()
 
         except Exception as e:
@@ -90,7 +76,6 @@ def main(config_path):
             for single_lk in content:
                 single_lk['pitch_time'] = pitch_times.get(single_lk['lk_code'], 600)
                 pool.apply_async(start_server, args=(device, single_lk))
-        # pool.apply_async(run_backup)
 
         pool.close()
         pool.join()
