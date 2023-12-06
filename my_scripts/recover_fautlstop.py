@@ -28,8 +28,9 @@ def get_stations():
     return device_port
 
 
-def foo(device, port_node, ip='10.10.130.58', set_value=0):
+def foo(device, port_node, ip=None, set_value=0):
     try:
+        ip = os.environ.get('POSTGRES_IP', '10.10.130.58') if not ip else ip
         c = Client(f'opc.tcp://{ip}:{port_node[0]}')
         c.connect()
         c.get_node(f'ns=2;s={port_node[1]}').set_value(set_value)
